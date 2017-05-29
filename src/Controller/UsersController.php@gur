@@ -1,0 +1,496 @@
+<?php
+namespace App\Controller;
+use Cake\Network\Email\Email;
+use App\Controller\AppController;
+use Cake\Utility\Security;
+use Cake\I18n\Time;
+/**
+ * Users Controller
+ *
+ * @property \App\Model\Table\UsersTable $Users
+ */
+class UsersController extends AppController
+{
+
+    public $components = array('Paginator');
+    public $paginate = array(
+        'limit' => 10,
+        'order' => [
+            'Users.id' => 'desc'
+        ]
+    );
+
+    public function initialize()
+    {
+        parent::initialize();
+        $this->loadComponent('Search.Prg', [
+            'actions' => ['index','listdriver']
+        ]);
+        $this->viewBuilder()->layout('admin');
+        $this->loadModel('Dashboard');
+    }
+
+    /**
+     * Index method
+     *
+     * @return \Cake\Network\Response|null
+     */
+    public function index() {
+        
+        $query = $this->Users->find('search', $this->Users->filterParams($this->request->query))->where(['role' => 'user']);
+        $users = $this->paginate($query);
+        if(!empty($this->request->query))
+        {
+            if(count($users)>0)
+            {
+                $this->set(compact('users'));
+                $this->set('_serialize', ['users']); 
+            }
+       }
+        else
+        {
+        $this->set(compact('users'));
+        $this->set('_serialize', ['users']); 
+        }
+        
+    }
+    
+
+    /**
+     * View method
+     *
+     * @param string|null $id User id.
+     * @return \Cake\Network\Response|null
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     */
+    public function view($id = null)
+    {
+        
+        $user = $this->Users->get($id, [
+            'contain' => []
+        ]);
+        $this->set('user', $user);
+        $this->set('_serialize', ['user']);
+    }
+
+    /**
+     * Add method
+     *
+     * @return \Cake\Network\Response|void Redirects on successful add, renders view otherwise.
+     */
+    public function add() {
+        
+        $user = $this->Users->newEntity();
+        if ($this->request->is('post')) {
+            $post_data=$this->request->data;
+
+            if(!empty($post_data['profile_pic']['name'])){
+                $dest='../webroot/img/uploads';
+                $file = $post_data['profile_pic'];
+                $dimension=getimagesize($file['tmp_name']);
+                $allowed =  array('gif','png' ,'jpg','jpeg','JPG');
+                $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+                $width=$dimension[0];
+                $height=$dimension[1];
+
+                if(in_array($ext, $allowed)){
+                    if($width > 100 && $height > 80){
+                        $logo_image = $this->upload_image($dest,$file,'');
+                        chmod($dest.'/'.$logo_image,0777);
+                        $post_data['profile_pic'] = $logo_image;
+                        if(is_uploaded_file($file['tmp_name'])) {
+                            $n_height=200;
+                            $ratio=($width/$height);
+                            $n_width=$ratio*$n_height;
+                            $result = $this->resize($file['tmp_name'],$logo_image,$ext,$width,$height,$n_width,$n_height);
+                        }
+                    }else{
+                        $this->Flash->error(__('Invalid Image Size. Image must be atleast 85X70.','error'));
+                        return $this->redirect(['action' => 'add']);
+                    }
+                }else{
+                    $this->Flash->error(__('Invalid Image format. Allowed Format(gif,png ,jpg,jpeg).','error'));
+                    return $this->redirect(['action' => 'add']);
+                } 
+            }
+
+            if(isset($post_data['status']) && $post_data['status'] ) {
+                $post_data['status']=1;
+            }else{
+                $post_data['status']=0;  
+            }
+            if(isset($post_data['rank']) && !empty($post_data['rank']) )
+                {
+                  $post_data['rank']=$post_data['rank'];
+                }else{
+                    unset($post_data['rank']);
+                     }
+            $post_data['createdAt']=Time::parseDateTime(date("Y-m-d H:i:s"), 'yyyy/MM/dd HH:mm:ss');
+            //echo "<pre>";print_r($post_data);die;
+            $user = $this->Users->patchEntity($user, $post_data);
+               
+            if ($this->Users->save($user)) {
+                if($post_data['role'] == 'user') {
+                    $this->Flash->success(__('User Added Successfully'));
+                }
+                if($post_data['role'] == 'user') {
+                    return $this->redirect(['controller'=>'Users','action' => 'index']);
+                }
+            }else{
+                $this->Flash->error(__('The user could not be saved. Please, try again.'));
+            }
+        }
+        $this->set(compact('user'));
+        $this->set('_serialize', ['user']);
+    }
+
+    /**
+     * Edit method
+     *
+     * @param string|null $id User id.
+     * @return \Cake\Network\Response|void Redirects on successful edit, renders view otherwise.
+     * @throws \Cake\Network\Exception\NotFoundException When record not found.
+     */
+    public function edit($id = null)
+    {
+       if(!empty($id)){
+            $user = $this->Users->get($id, [
+                'contain' => ['Dashboard']
+            ]);
+        }
+        if ($this->request->is(['patch', 'post', 'put'])) {
+		    $post_data=$this->request->data;
+            if(!empty($post_data['profile_pic']['name'])){
+                $dest='../webroot/img/uploads';
+                $file = $post_data['profile_pic'];
+                $dimension=getimagesize($file['tmp_name']);
+                $allowed =  array('gif','png' ,'jpg','jpeg','JPG');
+                $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+                $width=$dimension[0];
+                $height=$dimension[1];
+
+                if(in_array($ext, $allowed)){
+                    if($width > 100 && $height > 80){
+                        $logo_image = $this->upload_image($dest,$file,'');
+                        chmod($dest.'/'.$logo_image,0777);
+                        $post_data['profile_pic'] = $logo_image;
+                        if(is_uploaded_file($file['tmp_name'])) {
+                            $n_height=200;
+                            $ratio=($width/$height);
+                            $n_width=$ratio*$n_height;
+                            $result = $this->resize($file['tmp_name'],$logo_image,$ext,$width,$height,$n_width,$n_height);
+                        }
+                    }else{
+                        $this->Flash->error(__('Invalid Image Size. Image must be atleast 85X70.','error'));
+                        return $this->redirect(['action' => 'edit']);
+                    }
+                }else{
+                    $this->Flash->error(__('Invalid Image format. Allowed Format(gif,png ,jpg,jpeg).','error'));
+                    return $this->redirect(['action' => 'edit']);
+                } 
+            }else{
+                $post_data['profile_pic'] = $post_data['image1'] ;
+            }
+            if(isset($post_data['status']) && $post_data['status'] )
+                {
+                  $post_data['status']=1;
+                }
+                else{
+                $post_data['status']=0;  
+                }
+                if(isset($post_data['password']) && !empty($post_data['password']) )
+                {
+                  $post_data['password']=$post_data['password'];
+                }else{
+                    unset($post_data['password']);
+                    unset($post_data['confpass']);
+                }
+                if(isset($post_data['rank']) && !empty($post_data['rank']) )
+                {
+                  $post_data['rank']=$post_data['rank'];
+                }else{
+                    unset($post_data['rank']);
+                     }
+                if(isset($post_data['score']) && !empty($post_data['score']) )
+                {
+                    if(!empty($id)){
+                    $all_score=$this->Dashboard->find('all')->where(['user_id'=>$id])->toArray();
+                    if(count($all_score)>0)
+                    {
+                    $this->Dashboard->updateAll(array('score'=>$post_data['score']),array('user_id'=>$id));
+                    }
+                    else{
+                        $post_data1=array('user_id'=>$id,'score'=>$post_data['score'],'created'=>Time::parseDateTime(date("Y-m-d H:i:s"), 'yyyy/MM/dd HH:mm:ss'));
+                        $user = $this->Dashboard->newEntity();
+                        $user=$this->Dashboard->patchEntity($user, $post_data1);
+                        $this->Dashboard->save($user);
+                    }
+                    }
+                }else{
+                    unset($post_data['score']);
+                     }
+                    
+                $user = $this->Users->patchEntity($user, $post_data);
+                if ($this->Users->save($user)) {
+                if($post_data['role'] == 'user')
+                {
+                $this->Flash->success(__('The user has been updated.'));
+                 }
+                 
+                if($user->role == 'user'){
+                //return $this->redirect(['controller'=>'Users','action' => 'edit/'.$id]);
+                return $this->redirect(['controller'=>'Users','action' => 'index']);
+                }
+            } else {
+                $this->Flash->error(__('The user could not be saved. Please, try again.'));
+            }
+        }
+        $this->set(compact('user'));
+        $this->set('_serialize', ['user']);
+    }
+
+    /**
+     * Delete method
+     *
+     * @param string|null $id User id.
+     * @return \Cake\Network\Response|null Redirects to index.
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     */
+    public function delete($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+        $user = $this->Users->get($id);
+        if ($this->Users->delete($user)) {
+           
+            $this->Flash->success(__('The user has been deleted.'));
+        
+        } else {
+            $this->Flash->error(__('The user could not be deleted. Please, try again.'));
+        }
+        
+            return $this->redirect(['action' => 'index']); 
+      
+       
+    }
+
+    public function login() { 
+        if ($this->request->is('post')) {
+            $user = $this->Auth->identify();
+            $isAuthorized=$this->isAuthorized($user);
+            if($isAuthorized){
+                if ($user) {
+                    $this->Auth->setUser($user);
+                    return $this->redirect($this->Auth->redirectUrl());
+                }
+                $this->Flash->error(__('Invalid username or password, try again'));
+            }else{
+                $this->Flash->error(__('Please Enter valid Email or Password.'));
+            }
+        }
+        if($this->Auth->user()){
+            return $this->redirect($this->Auth->redirectUrl());
+        }
+    }
+
+    public function logout(){
+        return $this->redirect($this->Auth->logout());
+    }
+
+    public function checkEmailExist(){
+        $total = $this->Users->find('all',array('conditions'=>array('Users.email' => $_REQUEST['email'])))->toArray();
+        if(count($total) > 0){
+            echo "false";die;
+        }else{
+            echo "true";die;    
+        }
+    }
+
+        /*-------------status active deactive-----------------------*/
+        public function status()
+        {
+            $status_msg=array('0'=>'Activate','1'=>'Deactivate');
+            $response=array();
+             if($this->request->is('get')){
+                    $edit_id = $this->request->query['id'];
+                    $status = $this->request->query['status'];
+                    # Activate/Deactivate Customer
+                    if($status=="0" || $status=="1")
+                    { 
+                        if($status) {
+                            $status_arr = array("status"=>0);
+                            } 
+                        else {
+                            $status_arr = array("status"=>1);
+                        }
+                        $this->Users->updateAll( $status_arr,  array('id' => $edit_id ));
+                        //$this->redirect(array("users" => "admin_dashboard",'action'=>'index')); 
+                        $status1=$status_msg[$status];
+                        $result=$status1=='Deactivate' ? 'Activate' : 'Deactivate';
+                        $response['error']='false';
+                        $response['result']=$result;
+                        $response['status']=$status_arr['status'];
+                        //print_r($response);die;
+                        echo json_encode($response);
+                        die;
+                    }
+                    die();
+                }
+
+        }
+
+        /*--------------------forgot password function for send mail----------------------------*/
+
+
+          #Forgot password 
+    public function forgotPass(){
+        $this->loadModel('Users');
+        if($this->request->is('post')){
+            $post_data = $this->request->data;
+            $email = $this->Users->find('all')->where(['email =' => $post_data['email'],'role'=>'admin'])->toArray();
+            
+            if(count($email)){
+                $id=$email[0]->id;
+                $name=$email[0]->name;
+                $rand_url=rand(1000,9000);
+                $rand_url2=rand(1000,9000);
+                $code=$rand_url.$id.$rand_url2;
+                $p_r_code=array('reset_token'=>$code);
+                $this->Users->updateAll( $p_r_code,  array('id' => $id)); 
+                $pass_vars = array('code' => $code,'name'=>$name);
+                
+                $email = new Email('default');
+                 $email->to($post_data['email'])
+                ->template('forgot_pass')
+                ->viewVars($pass_vars)
+                ->emailFormat('html')
+                ->subject('Password Reset')
+                ->from('newworldapp@app.com')
+                ->send();
+
+                $this->Flash->error(__('Email Successfully Send'));
+                return $this->redirect(['action' => 'index']); 
+            }else{
+                $this->Flash->error(__('You are not authorized user.'));
+            }
+        }
+
+       
+    }
+
+    #Reset Password
+    public function resetPass()
+    { 
+        //$this->viewBuilder()->layout('admin');
+        $this->loadModel('Users');
+        if($this->request->is('get'))
+        {
+                $url_code= $this->request->query('code');
+                if($url_code)
+                    {
+                        $link_code = $this->Users->find('all')->where(['reset_token' => $url_code])->toArray();
+                                if(!count($link_code))
+                                    {
+                                   
+                                    echo '<h2>This Link has Expired</h2>';
+                                    die();
+                                    }
+                                }
+                                else{
+                                    echo '<h2>Not a Valid Url</h2>';
+                                    die();
+                                    }
+                    }
+                    if($this->request->is('post'))
+                    {
+                            $post_data = $this->request->data;
+                            $url_code= $this->request->query('code');
+                            $str2 = substr($url_code, 4);
+                            $url_id=substr_replace($str2 ,"",-4);
+                            $new_pass = md5($post_data['password']);
+                            $new_password=array('password'=>$new_pass);
+                            $this->Users->updateAll( $new_password,  array('id' => $url_id )); 
+                            $this->Users->updateAll( array('reset_token'=>''),  array('id' => $url_id )); 
+                                 $email = $this->Users->find('all')->where(['id' => $url_id])->toArray();
+                                 $this->Flash->error(__('Password change successfully'));
+                                 return $this->redirect(array('controller'=>'users','action'=>'login'));
+                    }   
+
+       
+    }
+
+/**
+             * Edit method
+             *
+             * @param string|null $id admin id.
+             */
+
+            public function editAdmin($id=null)
+            {
+                $uid = $this->Auth->User('id');
+                $user=$this->Users->get($uid,[
+                    'contain'=>[]
+                    ]);
+                unset($user['password']);
+                if($this->request->is(['patch','post','put']))
+                 {
+                    $post_data=$this->request->data;
+                    if (!empty($post_data['password'])){
+                    $post_data['password'] = $post_data['password'];
+                  }
+                  else 
+                  {
+                    unset($post_data['password']);
+                  }
+                    $user=$this->Users->patchEntity($user,$post_data);
+                    if($this->Users->save($user))
+                    {
+                        $this->Flash->success(__('Your Profile Updated Successfully.'));
+                    }
+                    else{
+                        $this->Flash->error(_('The user could not be updated. Please, try again.'));
+                    }
+               }
+               $this->set(compact('user'));
+               $this->set('_serialize', ['user']);
+            }
+
+            public function userAccount()
+            {
+                $uid = $this->Auth->user('id');
+
+                $user_detail = $this->Users->get($uid, [
+                    'contain' => []
+                ])->toArray();
+                $userdate=$user_detail['created'];
+                $date1=$userdate->i18nFormat('YYYY-MM-d');
+                $date2=date('Y-m-d');
+                $diff = abs(strtotime($date2) - strtotime($date1));
+                    $years = floor($diff / (365*60*60*24));
+                    $months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
+                    $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24));
+                    if($days==0)
+                    {
+                     $days='';
+                     }
+                    if($days>7)
+                    {
+                        $days=floor($days/7).' week, '.floor($days%7).' day';  
+                                                          
+                        }
+                        else{
+                             $days=$days . ' days';
+                              }
+                    $result=array('id'=>$uid,'name'=>$user_detail['name'],'image'=>$user_detail['profile_pic'],'year'=>$years,'month'=>$months,'week'=>$days
+
+                        );
+                $this->set('result', $result);
+                $this->set('_serialize', ['result']);
+
+
+            }
+
+
+
+
+
+}

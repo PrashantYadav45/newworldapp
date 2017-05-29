@@ -1,0 +1,86 @@
+<?php
+namespace App\Controller;
+use Cake\Network\Email\Email;
+use App\Controller\AppController;
+use Cake\Utility\Security;
+use Cake\I18n\Time;
+/**
+ * Users Controller
+ *
+ * @property \App\Model\Table\UsersTable $Users
+ */
+class OnsiteController extends AppController
+{
+
+    public $components = array('Paginator');
+    public $paginate = array(
+        'limit' => 10,
+        'order' => [
+            'Users.id' => 'desc'
+        ]
+    );
+
+    public function initialize()
+    {
+        parent::initialize();
+        $this->loadComponent('Search.Prg', [
+            'actions' => ['index']
+        ]);
+        $this->viewBuilder()->layout('admin');
+    }
+
+    /**
+     * Index method
+     *
+     * @return \Cake\Network\Response|null
+     */
+    public function index() {
+        
+        $query = $this->Onsite->find('search', $this->Onsite->filterParams($this->request->query))->where(['game_type'=>'onsite']);
+        $onsite = $this->paginate($query);
+        if(!empty($this->request->query))
+        {
+            if(count($onsite)>0)
+            {
+                $this->set(compact('onsite'));
+                $this->set('_serialize', ['onsite']); 
+            }
+       }
+        else
+        {
+        $this->set(compact('onsite'));
+        $this->set('_serialize', ['onsite']); 
+        }
+        
+    }
+    
+
+    /**
+     * Delete method
+     *
+     * @param string|null $id User id.
+     * @return \Cake\Network\Response|null Redirects to index.
+     * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
+     */
+    public function delete($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+        $onsite = $this->Onsite->get($id);
+        if ($this->Onsite->delete($onsite)) {          
+            $this->Flash->success(__('The onsite game has been deleted.'));        
+        } else {
+            $this->Flash->error(__('The onsite game could not be deleted. Please, try again.'));
+        }
+        
+            return $this->redirect(['action' => 'index']); 
+       
+       
+    }
+
+    
+
+
+
+
+
+}

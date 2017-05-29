@@ -1,0 +1,94 @@
+<?php
+namespace App\Controller;
+use Cake\Network\Email\Email;
+use App\Controller\AppController;
+use Cake\Utility\Security;
+use Cake\I18n\Time;
+/**
+ * Users Controller
+ *
+ * @property \App\Model\Table\UsersTable $Users
+ */
+class GameRulesController extends AppController
+{
+
+    public $components = array('Paginator');
+    public $paginate = array(
+        'limit' => 10,
+        'order' => [
+            'id' => 'desc'
+        ]
+    );
+
+    public function initialize()
+    {
+        parent::initialize();
+        $this->loadComponent('Search.Prg', [
+            'actions' => ['index']
+        ]);
+        $this->viewBuilder()->layout('admin');
+    }
+
+    /**
+     * Index method
+     *
+     * @return \Cake\Network\Response|null
+     */
+    public function index() {
+
+
+
+
+        
+    $this->loadModel('GameRules');
+
+
+
+  $GameRules = $this->GameRules->newEntity();
+               $GameRules->admin = $this->Auth->user('id');
+
+      
+
+    }
+    
+
+ public function add() {
+    $this->loadModel('GameRules');
+            $GameRules = $this->GameRules->newEntity();
+
+
+
+            $post_data=$this->request->data;
+
+           
+
+  $GameRules = $this->GameRules->patchEntity($GameRules, $post_data);
+               
+            if ($this->GameRules->save($GameRules)) {
+              
+                    $this->Flash->success(__('Rule Added Successfully'));
+             
+                
+            }else{
+                $this->Flash->error(__('The Rule could not be saved. Please, try again.'));
+            }
+
+
+return $this->redirect(
+            ['controller' => 'GameRules', 'action' => 'index']
+        );
+
+   
+
+}
+
+
+
+
+
+
+
+
+
+
+}

@@ -1,0 +1,3 @@
+[16-Feb-2017 17:33:50 Asia/Hong_Kong] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4337785 bytes) in /home/newworldapp/public_html/newworld/src/Controller/AppController.php on line 138
+[16-Feb-2017 17:38:40 Asia/Hong_Kong] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4337785 bytes) in /home/newworldapp/public_html/newworld/src/Controller/AppController.php on line 138
+[28-Mar-2017 15:12:07 Asia/Hong_Kong] PHP Fatal error:  Allowed memory size of 33554432 bytes exhausted (tried to allocate 4486163 bytes) in /home/newworldapp/public_html/newworld/src/Controller/AppController.php on line 138

@@ -1,0 +1,348 @@
+ <div id="wrapper">
+        <!-- Navigation -->
+       <?= $this->element('nav'); ?>
+       <div id="page-wrapper" style="min-height: 343px;">
+            <div class="row spacing">
+                <div class="col-lg-12 main_heading">
+ <?= $this->Flash->render();?>
+                    <h1 class="page-header"><i class="fa fa-user"></i> Add Tabloid</h1>
+                </div>
+
+            </div>
+            <div class="row spacing">
+                 <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading heading_label">
+                                <!--<span class="semi-bold">User Listing</span> -->
+                            </div>
+                            <div class="row spacing">
+                                     
+                                <div class="col-md-7 right">
+                                    
+                              
+                            
+                            <div class="panel-body">
+
+                   <form onsubmit="return atleast_onecheckbox(event)" action="<?php echo HTTP_ROOT ?>tabloid/add" enctype='multipart/form-data' method="post" id="sign-up_area" role="form">
+
+
+                    <div class="form-group">
+                      <label for="title">Title*</label>
+                      <input name="title" type="title" class="form-control" id="title">
+                    </div>
+                  
+                    <div class="form-group">
+                      <label for="title">Game Type</label>
+                      <input name="game_type" type="text" value="tabloid" readonly="true" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                      <label for="pwd">Password:</label>
+                      <input name="password" type="password" class="form-control" id="pwd">
+                    </div>
+
+                    <div class="form-group">
+                      <label for="from">Start Date:</label>
+                      <input type="text" class="form-control" name="start_date" id="from"  placeholder="Enter Start Date" required>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="from">Start Time:</label>
+                          <input type='text' class="form-control" id='from_time' name="start_time" placeholder="Enter Start Time" />
+                    </div>
+                    
+                    <div class="form-group">
+                      <label for="to">End Date:</label>
+                      <input type="text" class="form-control" name="end_date" id="to"  placeholder="Enter End Date" placeholder="Enter end date" required>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="from">End Time:</label>
+                          <input type='text' class="form-control" id='to_time' name="end_time" placeholder="Enter End Time" />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="comment">Terms & Conditions:</label>
+                      <textarea name="terms_condition" class="form-control" rows="5"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="comment">Question:</label>
+                      <textarea name="question_text" class="form-control" rows="5" ></textarea>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="pwd">Marks:</label>
+                      <input name="marks" type="text" class="form-control" >
+                    </div>
+
+                    <div class="sign-up_box">
+
+                           <div class="form-group">
+                              <label for="title">Answer A</label>
+                              <input type="text" class="form-control" name="answer_a"  required>
+                            </div>
+                            <input type="checkbox" class="example" name="rightanswer[]" value="0"/>
+                          
+
+                            <div class="form-group">
+                              <label for="title">Answer B</label>
+                              <input type="text" class="form-control" name="answer_b"   required>
+                            </div>
+                            <input type="checkbox" class="example" value="1" name="rightanswer[]" />
+
+                            <div class="form-group">
+                              <label for="title">Answer C</label>
+                              <input type="text" class="form-control" name="answer_c"  required>
+                            </div>
+                            <input type="checkbox" class="example" value="2" name="rightanswer[]" />
+
+                            <div class="form-group">
+                              <label for="title">Answer D</label>
+                              <input type="text" class="form-control" name="answer_d"  required>
+                            </div>
+                            <input type="checkbox" class="example" name="rightanswer[]" value="3" />
+
+                    </div><!-- end sign-up_box -->
+
+                    <div class="form-group form_row">
+                        <label class="col-lg-2 form_lable">Image:</label>
+                        <input type="file" name="image" class="form-control col-lg-10" >
+                    </div>
+
+                    <input type="submit" value="Submit"></input>
+
+
+
+              </form>
+
+
+
+                                
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            <!-- /.row -->
+
+
+        </div>
+</div>
+
+
+<script type="text/javascript">
+    function atleast_onecheckbox(e) {
+      if ($("input[type=checkbox]:checked").length === 0) {
+          e.preventDefault();
+          alert('Please Select on Right Answer');
+          return false;
+      }
+    }
+        $(document).ready(function() {
+            jQuery.validator.addMethod("checkDates", function(value, element) { 
+            return  compareDates() ;
+          }, "End date/time must be after start");
+
+          function compareDates() {
+              var startDate = $("#from").datepicker('getDate');
+              var endDate = $("#to").datepicker('getDate');
+              
+              if( !startDate || !endDate){
+                return false;
+              }
+
+              if(endDate > startDate) {
+                  return true;
+              } else {
+                var endTime = endDate.getTime() + $('#to_time').parseValToNumber();
+                console.log("endTime",endTime);
+                var startTime = startDate.getTime() + $('#from_time').parseValToNumber();
+                console.log("startTime",startTime);
+                return endTime > startTime;
+              }
+          }
+
+          $.fn.parseValToNumber = function() {
+            return parseInt($(this).val().replace(':',''), 10);
+          }
+
+          $('select').change(function(){
+            $('#start_date, #end_date').keyup()
+          });
+
+            $('#sign-up_area').validate({
+              // onfocusout: function (element) {
+              //    $(element).valid();
+              //   },
+                rules:
+                {
+                     "title":
+                    {
+                        required:true,
+                        accept:"[A-Za-z]",
+                        maxlength: 50
+                    },
+                    "password":
+                    {
+                       required:true,
+                       minlength: 6,
+                       maxlength: 18
+                    },
+                    "terms_condition":
+                    {
+                       required:true
+                    },
+                    "question_text":
+                    {
+                       required:true
+                    },
+                    "marks":
+                    {
+                       required:true,
+                       number:true
+                    },
+                    "answer_a":
+                    {
+                       required:true
+                    },
+                    "answer_b":
+                    {
+                       required:true
+                    },
+                    "answer_c":
+                    {
+                       required:true
+                    },
+                    "answer_d":
+                    {
+                       required:true
+                    },
+                    "start_date":
+                    {
+                       required:true
+                    },
+                    "end_date":
+                    {
+                       required:true,
+                       checkDates:true
+                    },
+                    "from_time":
+                    {
+                       required:true
+                    },
+                    "to_time":
+                    {
+                       required:true
+                    },
+                    "image":
+                    {
+                       required:true
+                       accept:'jpeg,jpg,png,gif'
+                    }
+
+                },   
+                messages:
+                {
+                    "title":
+                    {
+                       required:"Please Enter Title" ,
+                       accept: "Please enter a name only alphabets."
+                    },
+                    "password":
+                    {
+                       required:"Please Enter Password.",
+                       minlength: 'Password should be atleast 6 characters long.'
+                    },
+                    "terms_condition":
+                    {
+                       required:"Please add Terms & Conditions."
+                    },
+                    "question_text":
+                    {
+                       required:"Please Enter Question."
+                    },
+                    "marks":
+                    {
+                       required:"Please Enter Marks."
+                    },
+                    "answer_a":
+                    {
+                       required:"Please Answer the Question."
+                    },
+                    "answer_b":
+                    {
+                       required:"Please Answer the Question."
+                    },
+                    "answer_c":
+                    {
+                       required:"Please Answer the Question."
+                    },
+                    "answer_d":
+                    {
+                       required:"Please Answer the Question."
+                    },
+                    "image":
+                    {
+                        required:"Please Upload Image.",
+                        accept:"Image not supported, please try with other one."
+                    }
+
+                  
+                }
+            });
+
+          $('input.example').on('change', function() {
+              $('input.example').not(this).prop('checked', false);  
+          });
+
+        });
+  </script>   
+
+    <script type="text/javascript">
+  $(function() {
+    $( "#from" ).datepicker({
+      defaultDate: "0",
+      changeMonth: true,
+      minDate: new Date(),
+      numberOfMonths: 1,
+      dateFormat: 'yy-mm-dd',
+      onSelect:function(){
+        if($(this).hasClass('error')){
+          $(this).trigger('keyup')
+        }
+      },
+      onClose: function( selectedDate ) {
+        $( "#to" ).datepicker( "option", "minDate", selectedDate );
+      }
+    });
+
+    $( "#to" ).datepicker({
+      defaultDate: "+1w",
+      changeMonth: true,
+      numberOfMonths: 1,
+      minDate: new Date(),
+      dateFormat: 'yy-mm-dd',
+      onSelect:function(){
+        if($(this).hasClass('error')){
+          $(this).trigger('keyup')
+        }
+      },
+      onClose: function( selectedDate ) {
+        $( "#from" ).datepicker( "option", "maxDate", selectedDate );
+      }
+    });
+
+    $('#from_time').datetimepicker({
+      format: 'HH:mm:ss',
+      locale: 'ru'
+    });
+
+    $('#to_time').datetimepicker({
+      format: 'HH:mm:ss',
+      locale: 'ru'
+    });
+
+  });
+
+  </script> 
+  

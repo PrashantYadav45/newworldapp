@@ -1,0 +1,288 @@
+ 
+
+ <div id="wrapper">
+        <!-- Navigation -->
+       <?= $this->element('nav'); ?>
+       <div id="page-wrapper" style="min-height: 343px;">
+            <div class="row spacing">
+                <div class="col-lg-12 main_heading">
+                <?= $this->Flash->render();?>
+                    <h1 class="page-header"><i class="fa fa-user"></i> User Listing</h1>
+                </div>
+
+            </div>
+            <div class="row spacing">
+                <div class="col-lg-12 main_heading">
+                     <?= $this->Flash->render();?>
+                </div>
+                 <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading heading_label">
+                              </div>
+                            <div class="row spacing">
+                                    <?php echo $this->Form->create(); ?>
+                             <div class="col-md-7 right">
+                                    <!-- <div class="col-xs-6">
+                                    <?php echo $this->Form->input('name',array("required"=>'true',"class"=>"form-control","id"=>"filterdriver","placeholder"=>"Search By Username or Email","label"=>"")); ?>
+                                    </div>
+                                    <?php echo $this->Form->button('Filter', array("class"=>"btn btn-default","id"=>"searchForm"),['type' => 'submit']); ?>
+                                    <div class="btn btn-default reset"> <?php echo $this->Html->link('Reset',array("class"=>"btn btn-default"), ['action' => 'index']); ?></div>-->
+                                </div>
+                                    <?php echo $this->Form->end(); ?>
+
+                                    <div class="btn btn-default btn-danger"><a href="<?php echo HTTP_ROOT ?>users/add?role=user" >Add User</a>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th><?= $this->Paginator->sort('name','Name') ?></th>
+                                                <th><?= $this->Paginator->sort('email') ?></th>
+                                                <th><?= $this->Paginator->sort('status') ?></th>
+                                                <th><?= $this->Paginator->sort('Member Since') ?></th>
+                                                <th><?= $this->Paginator->sort('Last access') ?></th>
+                                                
+                                                <th class="actions"><?= __('Actions') ?></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        <?php 
+                                            if(!empty($users)){
+                                                foreach ($users as $user): 
+                                                    //$user->created;
+                                                 $userdate=strtotime($user->created);
+                                                   /* $date1=$userdate->i18nFormat('YYYY-MM-d');
+                                                    $date2=date('Y-m-d');
+                                                    $diff = abs(strtotime($date2) - strtotime($date1));
+                                                        $years = floor($diff / (365*60*60*24));
+                                                        $months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
+                                                        $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24));
+                                                        if($days>7)
+                                                        {
+                                                          $days=floor($days/7).' week '.floor($days%7).' days';  
+                                                          
+                                                        }
+                                                        else{
+                                                            $days=floor($days%7).' days';
+                                                        }
+                                                        if($months==0)
+                                                        {
+                                                            if($days>6)
+                                                            {
+                                                            $months=floor($days/7).' week ';
+                                                            }
+                                                            else{
+                                                                $months='';
+                                                            }
+                                                        }
+                                                        else{
+                                                            $months=$months.' months ';
+                                                        }*/
+                                                    ?>
+                                        <tr>                                          
+                                            <td><?= h($user->name) ?></td>
+                                            <td><?= h($user->email) ?></td>
+                                            <td><?php if(($user->status)==1){ 
+                                                echo 'active'; } 
+                                                else{ echo 'blocked'; } ?></td>
+                                            <td><?php echo  humanTiming($userdate)?></td>
+                                            <td><?php 
+                                            $last_login=strtotime($user->last_login);
+
+
+                                          /*  if(!empty($last_login))
+                                            {
+                                            $current_date=date('Y-m-d h:i:s');
+                                            $date3 = date_create($last_login);
+                                            $date4 = date_create($current_date);
+                                            $diff34 = date_diff($date4, $date3);
+                                            $date1=strtotime($last_login);
+                                            $date2=strtotime($current_date);
+                                            $seconds1 = $date2 - $date1;
+                                            $weeks = floor($seconds1/604800);
+
+                                            //accesing days
+                                            $days = $diff34->d;
+                                            if($days==0)
+                                            {
+                                            $days='';
+                                            }
+                                            else if($days>7)
+                                                        {
+                                                          $days=floor($days/7).' week '.floor($days%7).' day(s) ';  
+                                                          
+                                                        }
+                                            else{
+                                                $days=$days . ' day(s), ';
+                                            }
+
+                                            //accesing months
+                                            $months = $diff34->m;
+                                            if($months==0)
+                                            {
+                                            $months='';
+                                            }
+                                            else{
+                                                $months=$months . ' month(s), ';
+                                                }
+                                            //accesing years
+                                            $years = $diff34->y;
+                                            if($years==0)
+                                            {
+                                            $years='';
+                                            }
+                                            else{
+                                                $years=$years . ' year(s), ';
+                                                }
+
+                                            //accesing hours
+                                            $hours=$diff34->h;
+                                            if($hours==0)
+                                            {
+                                            $hours='';
+                                            }
+                                            else{
+                                                $hours=$hours.' hour(s),';
+                                                }
+
+                                            //accesing minutes
+                                            $minutes=$diff34->i;
+                                            if($minutes==0)
+                                            {
+                                            $minutes='';
+                                            }
+                                            else{
+                                                $minutes=$minutes.' minute(s), ';
+                                                }
+                                            //accesing seconds
+                                            $seconds=$diff34->s;
+                                            if($seconds==0)
+                                            {
+                                            $seconds='';
+                                            }
+                                            else{
+                                                $seconds=$seconds.' second(s)';
+                                                }*/
+                                    echo  humanTiming($last_login);
+                                       // }
+                                      /*  else{
+                                            echo 'never';
+                                        }*/
+
+                                            ?></td>
+                                            <td class="actions">
+                                                       
+                                <?= $this->Html->link(
+                                 $this->Html->tag('span', '', array('class' => 'glyphicon glyphicon-edit')),
+                                array('action'=>'edit', $user->id ,'?role=user'), array('class' => 'btn btn-info btn-xs', 'target' => '_self','escape' => false, 'rel'=>'tooltip', 'data-placement'=>'top', 'title'=>'Edit'))?>
+                                <?= $this->Form->postLink('<i class="glyphicon glyphicon-trash"></i> ',
+                                        ['action' => 'delete', $user->id], 
+                                        [
+                                            'escape' => false,
+                                            'confirm' => __('Are you sure, you want to delete?'),
+                                            'rel'=>'tooltip', 'data-placement'=>'top', 'title'=>'Delete'
+                                        ]
+                                    ) ?>
+
+                                        <a class="a_active" statusid="<?php echo $user->id; ?>" id="status<?php echo $user->id; ?>" href="<?php echo HTTP_ROOT; ?>users/status"  status="<?php echo $user->status; ?>" > <?php if ($user->status) { ?> 
+                                                     Deactivate
+                                                        <?php }else{ ?>
+                                                             Activate
+                                                        <?php } ?>
+                                                    </a>
+
+                                    </td>
+                                            
+                                        </tr>
+                                        <?php endforeach; ?>
+                                        <?php }else{ ?>
+                                    <tr> <td colspan="6"><center>No Records Found!</center></td></tr>
+                                        <?php } ?>
+                                    </tbody>
+                                    </table>
+                                    <div class="paginator">
+                                    <ul class="pagination">
+                                        <?= $this->Paginator->prev('< ' . __('previous')) ?>
+                                        <?= $this->Paginator->numbers() ?>
+                                        <?= $this->Paginator->next(__('next') . ' >') ?>
+                                    </ul>
+                                    <p><?= $this->Paginator->counter() ?></p>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            <!-- /.row -->
+
+
+        </div>
+</div>
+<?php
+
+function humanTiming ($time)
+{
+
+    $time = time() - $time; // to get the time since that moment
+    $time = ($time<1)? 1 : $time;
+    $tokens = array (
+        31536000 => 'year',
+        2592000 => 'month',
+        604800 => 'week',
+        86400 => 'day',
+        3600 => 'hour',
+        60 => 'minute',
+        1 => 'second'
+    );
+
+    foreach ($tokens as $unit => $text) {
+        if ($time < $unit) continue;
+        $numberOfUnits = floor($time / $unit);
+        return $numberOfUnits.' '.$text.(($numberOfUnits>1)?'s':'');
+    }
+
+}
+
+?>
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+       $(".a_active").click(function (event){ 
+        if(!confirm("Are You Sure ?")){
+         return false;
+        }
+        event.preventDefault();
+        var id=$(this).attr('statusid');
+        var url = $(this).attr("href");
+        var data = $(this).attr("status");
+
+        $.ajax({
+            type:"GET",
+            url:url,
+            data:{'status':data,'id':id},
+            success: function(result){
+            var json = $.parseJSON(result);
+            $('#status'+id).text('');
+            $('#status'+id).text(json['result']);
+             if(json['result'] == 'Activate'){
+                $('#status'+id).css("background-color", "green");
+                location.reload();
+            }else{
+                $('#status'+id).css("background-color", "");
+                location.reload();
+            }
+            $('#status'+id).attr('status','');
+            $('#status'+id).attr('status', json['status']); 
+            },
+            error: function(e){}
+        });
+
+    });
+  });
+    $( ".a_active[status='0']" ).css("background-color", "green");
+</script>
+
+ 

@@ -1,0 +1,339 @@
+ <div id="wrapper">
+        <!-- Navigation -->
+       <?= $this->element('nav'); ?>
+       <div id="page-wrapper" style="min-height: 343px;">
+            <div class="row spacing">
+                <div class="col-lg-12 main_heading">
+                  <?= $this->Flash->render();?>
+                    <h1 class="page-header"><i class="fa fa-user"></i> Edit I-World</h1>
+                </div>
+
+            </div>
+            <div class="row spacing">
+                 <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading heading_label">
+                                <!--<span class="semi-bold">User Listing</span> -->
+                            </div>
+                            <div class="row spacing">
+                                     
+                                <div class="col-md-7 right">
+                                    
+                              
+                            
+                            <div class="panel-body">
+
+                   <form onsubmit="return atleast_onecheckbox(event)" action="<?php echo HTTP_ROOT .'iworld/edit/'.$data->id ?>" method="post" id="sign-up_area" enctype='multipart/form-data' role="form">
+                    <input name="id" type="hidden" value="<?= $data['id']; ?>" >
+                    <input name="question_id" type="hidden" value="<?= $data['question']['id']; ?>" >
+                  
+                    <div class="form-group">
+                      <label for="title">Title*</label>
+                      <input name="title" type="text" value="<?= $data['title']; ?>" class="form-control" id="title">
+                    </div>
+                  
+                    <div class="form-group">
+                      <label for="type">Game Type</label>
+                      <input name="game_type" type="text" value="iworld" readonly="true" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                      <label for="pwd">Password:</label>
+                      <input name="password" type="password" value="<?= $data['password']; ?>" class="form-control" id="pwd">
+                    </div>
+
+                    <div class="form-group">
+                      <label for="from">Start Date:</label>
+                      <input type="text" class="form-control" value="<?=  isset($data->startdate) ? $data->startdate->format('Y-m-d') : '' ?>" name="start_date" id="from"  placeholder="Enter Start Date" required>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="from">Start Time:</label>
+                          <input type='text' class="form-control" value="<?=  isset($data->startdate) ?  $data->startdate->format('H:i:s') : ''?>" id='from_time' name="start_time" placeholder="Enter Start Time" />
+                    </div>
+                    
+                    <div class="form-group">
+                      <label for="to">End Date:</label>
+                      <input type="text" class="form-control" value="<?=  isset($data->enddate) ?  $data->enddate->format('Y-m-d') : '' ?>" name="end_date" id="to" placeholder="Enter end date" required>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="from">End Time:</label>
+                          <input type='text' class="form-control" value="<?=  isset($data->enddate) ? $data->enddate->format('H:i:s') : '' ?>" id='to_time' name="end_time" placeholder="Enter End Time" />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="comment">Terms & Conditions:</label>
+                      <textarea name="terms_condition" class="form-control" rows="5"><?= $data['terms_condition']; ?></textarea>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="comment">Question:</label>
+                      <textarea name="question_text" class="form-control" rows="5" ><?= $data['question']['question_text']?></textarea>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="pwd">Marks:</label>
+                      <input name="marks" value="<?= $data['question']['marks']; ?>" type="text" class="form-control" >
+                    </div>
+                   
+                    <div class="sign-up_box">
+
+                           <div class="form-group">
+                              <label for="title">Answer A</label>
+                              <input type="text" value="<?= $data['question']['questionanswersoptions'][0]['answer_option_text'] ?>"  class="form-control" name="answer_a"  required>
+                            </div>
+                            <input type="checkbox" class="example" name="rightanswer[]" value="0" <?php if($data['question']['questionanswersoptions'][0]['rightanswer'] ==1){?>checked="checked"<?php }?>/>
+                           
+                            <div class="form-group">
+                              <label for="title">Answer B</label>
+                              <input type="text" value="<?= $data['question']['questionanswersoptions'][1]['answer_option_text'] ?>" class="form-control" name="answer_b"   required>
+                            </div>
+                            <input type="checkbox" class="example" value="1" name="rightanswer[]" <?php if($data['question']['questionanswersoptions'][1]['rightanswer'] ==1){?>checked="checked"<?php }?>/>
+         
+                            <div class="form-group">
+                              <label for="title">Answer C</label>
+                              <input type="text"  value="<?= $data['question']['questionanswersoptions'][2]['answer_option_text']; ?>" class="form-control" name="answer_c"  required>
+                            </div>
+                            <input type="checkbox" class="example" value="2" name="rightanswer[]" <?php if($data['question']['questionanswersoptions'][2]['rightanswer'] ==1){?>checked="checked"<?php }?>/>
+
+                            <div class="form-group">
+                              <label for="title">Answer D</label>
+                              <input type="text" class="form-control" value="<?= $data['question']['questionanswersoptions'][3]['answer_option_text']; ?>" name="answer_d"  required>
+                            </div>
+                            <input type="checkbox" class="example" name="rightanswer[]" value="3" <?php if($data['question']['questionanswersoptions'][3]['rightanswer'] ==1){?>checked="checked"<?php }?>/>
+
+                    </div><!-- end sign-up_box -->
+                    <div class="form-group form_row">
+                      <?php echo $this->Form->input('image', ['label'=>['class'=>'col-lg-2 form_lable','text' => 'Image'],'type'=>'file','class'=>'form-control col-lg-10']); ?>
+                      <?php if(!empty($data->game_image->image)) {?>
+                      <img width="50px;" src=<?php echo HTTP_ROOT.'img/uploads/'.$data->game_image->image; ?> >
+                      <?php } ?>
+                    </div>     
+                      <input type="hidden" name="image1" value="<?php echo $data->game_image->image; ?>">
+
+
+                    <input type="submit" value="Submit"></input>
+
+
+
+              </form>
+
+
+
+                                
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            <!-- /.row -->
+
+
+        </div>
+</div>
+
+
+<script type="text/javascript">
+    function atleast_onecheckbox(e) {
+      if ($("input[type=checkbox]:checked").length === 0) {
+          e.preventDefault();
+          alert('Please Select on Right Answer');
+          return false;
+      }
+    }
+        $(document).ready(function() {
+           jQuery.validator.addMethod("checkDates", function(value, element) { 
+                return  compareDates() ;
+              }, "End date/time must be after start");
+
+          function compareDates() {
+              var startDate = $("#from").datepicker('getDate');
+              var endDate = $("#to").datepicker('getDate');
+              
+              if( !startDate || !endDate){
+                return false;
+              }
+
+              if(endDate > startDate) {
+                  return true;
+              } else {
+                var endTime = endDate.getTime() + $('#to_time').parseValToNumber();
+                var startTime = startDate.getTime() + $('#from_time').parseValToNumber();
+                return endTime > startTime;
+              }
+          }
+
+          $.fn.parseValToNumber = function() {
+            return parseInt($(this).val().replace(':',''), 10);
+          }
+
+          $('select').change(function(){
+            $('#start_date, #end_date').keyup()
+          });
+
+          $('#sign-up_area').validate({
+              // onfocusout: function (element) {
+              //    $(element).valid();
+              //   },
+                rules:
+                {
+                     "title":
+                    {
+                        required:true,
+                        //accept:"[A-Za-z]",
+                        maxlength: 50
+                    },
+                    "password":
+                    {
+                       required:true,
+                       minlength: 6,
+                       maxlength: 18
+                    },
+                    "terms_condition":
+                    {
+                       required:true
+                    },
+                    "question_text":
+                    {
+                       required:true
+                    },
+                    "marks":
+                    {
+                       required:true,
+                       number:true
+                    },
+                    "answer_a":
+                    {
+                       required:true
+                    },
+                    "answer_b":
+                    {
+                       required:true
+                    },
+                    "answer_c":
+                    {
+                       required:true
+                    },
+                    "answer_d":
+                    {
+                       required:true
+                    },
+                    "start_date":
+                    {
+                       required:true
+                    },
+                    "end_date":
+                    {
+                       required:true,
+                       checkDates:true
+                    },
+                    "from_time":
+                    {
+                       required:true
+                    },
+                    "to_time":
+                    {
+                       required:true
+                    }
+
+                },   
+                messages:
+                {
+                    "title":
+                    {
+                       required:"Please Enter Title" ,
+                      // accept: "Please enter a name only alphabets."
+                    },
+                    "password":
+                    {
+                       required:"Please Enter Password.",
+                       minlength: 'Password should be atleast 6 characters long.'
+                    },
+                    "terms_condition":
+                    {
+                       required:"Please add Terms & Conditions."
+                    },
+                    "question_text":
+                    {
+                       required:"Please Enter Question."
+                    },
+                    "marks":
+                    {
+                       required:"Please Enter Marks."
+                    },
+                    "answer_a":
+                    {
+                       required:"Please Answer the Question."
+                    },
+                    "answer_b":
+                    {
+                       required:"Please Answer the Question."
+                    },
+                    "answer_c":
+                    {
+                       required:"Please Answer the Question."
+                    },
+                    "answer_d":
+                    {
+                       required:"Please Answer the Question."
+                    }
+
+                  
+                }
+            });
+
+          $('input.example').on('change', function() {
+              $('input.example').not(this).prop('checked', false);  
+          });
+
+        });
+  </script>   
+
+     <script type="text/javascript">
+  $(function() {
+    $( "#from" ).datepicker({
+      defaultDate: "0",
+      changeMonth: true,
+      minDate: new Date(),
+      numberOfMonths: 1,
+      dateFormat: 'yy-mm-dd',
+      onSelect:function(){
+        if($(this).hasClass('error')){
+          $(this).trigger('keyup')
+        }
+      },
+      onClose: function( selectedDate ) {
+        $( "#to" ).datepicker( "option", "minDate", selectedDate );
+      }
+    });
+
+    $( "#to" ).datepicker({
+      defaultDate: "+1w",
+      changeMonth: true,
+      numberOfMonths: 1,
+      minDate: new Date(),
+      dateFormat: 'yy-mm-dd',
+      onSelect:function(){
+        if($(this).hasClass('error')){
+          $(this).trigger('keyup')
+        }
+      },
+      onClose: function( selectedDate ) {
+        $( "#from" ).datepicker( "option", "maxDate", selectedDate );
+      }
+    });
+
+    $('#from_time').datetimepicker({
+      format: 'HH:mm:ss',
+      locale: 'ru'
+    });
+
+    $('#to_time').datetimepicker({
+      format: 'HH:mm:ss',
+      locale: 'ru'
+    });
+
+  });
+
+  </script>   
+   
